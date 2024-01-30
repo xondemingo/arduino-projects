@@ -2,26 +2,33 @@ const unsigned int DOT_DURATION = 1000;    // in ms
 const unsigned int DASH_DURATION = DOT_DURATION * 3;
 const unsigned int TIME_BETWEEN_DOTS_AND_DASHES_FROM_THE_SAME_LETTER = DOT_DURATION;
 const unsigned int TIME_BETWEEN_LETTERS = 3 * DOT_DURATION;
+const unsigned int TIME_BETWEEN_WORDS = 7 * DOT_DURATION;
 
 bool has_received_text = true;
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
-  //Serial.begin(9600);
 }
 
 void loop() {
   if (has_received_text) {
-    blink_text_in_morse("aBc");
+    blink_text_in_morse("aa B           c");
     has_received_text = false;
   }
 }
 
 void blink_text_in_morse(char* text) {
   for (unsigned int i = 0; i < strlen(text); i++) {
-    blink_letter_in_morse(text[i]);
-    if (i < strlen(text) - 1) {    
-      add_delay_between_letters();
+    if (isspace(text[i])) {  // TBD: need to check and trim the word so this works fine
+      if (!isspace(text[i-1])) {
+        add_delay_between_words();
+      }
+    }
+    else {
+      blink_letter_in_morse(text[i]);
+      if (i < strlen(text) - 1) {    
+        add_delay_between_letters();
+      }
     }
   }
 }
@@ -61,6 +68,10 @@ void add_delay_between_dots_and_dashes_from_the_same_letter() {
 
 void add_delay_between_letters() {
   delay(TIME_BETWEEN_LETTERS);
+}
+
+void add_delay_between_words() {
+  delay(TIME_BETWEEN_WORDS);
 }
 
 char* char_to_morse(char c) {
