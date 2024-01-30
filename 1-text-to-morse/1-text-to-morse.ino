@@ -5,16 +5,29 @@ const unsigned int TIME_BETWEEN_LETTERS = 3 * DOT_DURATION;
 const unsigned int TIME_BETWEEN_WORDS = 7 * DOT_DURATION;
 
 bool has_received_text = true;
+char* text;
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
+  text = "aa B     c";
 }
 
 void loop() {
   if (has_received_text) {
-    blink_text_in_morse("aa B           c");
+    if (can_translate_text_to_morse(text)) {
+      blink_text_in_morse(text);
+    }
     has_received_text = false;
   }
+}
+
+bool can_translate_text_to_morse(char* text) {
+  for (unsigned int i = 0; i < strlen(text); i++) {
+    if (!isalpha(text[i]) && !isspace(text[i])) {
+      return false;
+    }
+  }
+  return true;
 }
 
 void blink_text_in_morse(char* text) {
