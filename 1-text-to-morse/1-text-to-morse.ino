@@ -1,22 +1,43 @@
 const unsigned int DOT_DURATION = 1000;    // in ms
 const unsigned int DASH_DURATION = DOT_DURATION * 3;
 const unsigned int TIME_BETWEEN_DOTS_AND_DASHES_FROM_THE_SAME_LETTER = DOT_DURATION;
-const unsigned int EXTRA_TIME_BETWEEN_LETTERS = 3 * DOT_DURATION - TIME_BETWEEN_DOTS_AND_DASHES_FROM_THE_SAME_LETTER;
+const unsigned int TIME_BETWEEN_LETTERS = 3 * DOT_DURATION;
+
+bool has_received_text = true;
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);
+  //Serial.begin(9600);
 }
 
 void loop() {
-  blink_text_in_morse("hELlO");
+  if (has_received_text) {
+    blink_text_in_morse("aBc");
+    has_received_text = false;
+  }
 }
 
 void blink_text_in_morse(char* text) {
-  char* morse_code;
   for (unsigned int i = 0; i < strlen(text); i++) {
-    morse_code = char_to_morse(text[i]);
-    Serial.println(morse_code);
+    blink_letter_in_morse(text[i]);
+    if (i < strlen(text) - 1) {    
+      add_delay_between_letters();
+    }
+  }
+}
+
+void blink_letter_in_morse(char c) {
+  char* morse_code = char_to_morse(c);
+  for (unsigned int i = 0; i < strlen(morse_code); i++) {
+    if (morse_code[i] == '.') {
+      blink_dot();
+    }
+    else {
+      blink_dash();
+    }
+    if (i < strlen(morse_code) - 1) {
+      add_delay_between_dots_and_dashes_from_the_same_letter();
+    }
   }
 }
 
@@ -34,8 +55,12 @@ void blink(int duration) {
   digitalWrite(LED_BUILTIN, LOW);
 }
 
-void add_space_between_dots_and_dashes_from_the_same_letter() {
+void add_delay_between_dots_and_dashes_from_the_same_letter() {
   delay(TIME_BETWEEN_DOTS_AND_DASHES_FROM_THE_SAME_LETTER);
+}
+
+void add_delay_between_letters() {
+  delay(TIME_BETWEEN_LETTERS);
 }
 
 char* char_to_morse(char c) {
